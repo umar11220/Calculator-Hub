@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Calculator Hub Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI;}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(270deg,#0f2027,#203a43,#2c5364);
+  background-size:600% 600%;
+  animation:bg 12s ease infinite;
+  overflow:hidden;
+  color:white;
+}
+
+@keyframes bg{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+.container{text-align:center;}
+
+h1{
+  font-size:42px;
+  margin-bottom:30px;
+  text-shadow:0 0 25px rgba(255,255,255,0.5);
+}
+
+.cards{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.card{
+  width:220px;
+  height:150px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  transition:.5s;
+  box-shadow:0 15px 40px rgba(0,0,0,.4);
+}
+
+.card:hover{
+  transform:rotateY(15deg) scale(1.08);
+  background:rgba(255,255,255,0.2);
+}
+
+.card span{font-size:30px;margin-bottom:10px;}
+
+.popup{
+  position:fixed;
+  width:95%;
+  max-width:420px;
+  background:rgba(0,0,0,0.9);
+  padding:20px;
+  border-radius:20px;
+  display:none;
+}
+
+.display{
+  width:100%;
+  height:55px;
+  font-size:22px;
+  margin-bottom:10px;
+  text-align:right;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+}
+
+button{
+  padding:12px;
+  margin:5px;
+  font-size:14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#111;
+  color:white;
+}
+
+.close{background:red;margin-top:10px;}
+
+/* 🔥 WELCOME SCREEN */
+#welcome{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  animation:fadeOut 3s ease forwards;
+}
+
+#welcome h1{
+  font-size:45px;
+  color:white;
+  text-shadow:0 0 20px #00f2ff;
+  animation:zoomIn 1.5s ease;
+}
+
+@keyframes zoomIn{
+  from{transform:scale(0.5);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+
+@keyframes fadeOut{
+  0%{opacity:1;}
+  80%{opacity:1;}
+  100%{opacity:0;visibility:hidden;}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 🔥 WELCOME SCREEN -->
+<div id="welcome">
+  <h1>Welcome to Calculator Hub</h1>
+</div>
+
+<div class="container">
+<h1>Calculator Hub</h1>
+
+<div class="cards">
+  <div class="card" onclick="openCalc('student')"><span>📘</span>Student</div>
+  <div class="card" onclick="openCalc('scientific')"><span>🧪</span>Scientific</div>
+  <div class="card" onclick="openCalc('age')"><span>🎂</span>Age</div>
+  <div class="card" onclick="openCalc('gpa')"><span>🎓</span>GPA</div>
+  <div class="card" onclick="openCalc('percentage')"><span>📊</span>%</div>
+  <div class="card" onclick="openCalc('zakat')"><span>💰</span>Zakat</div>
+  <div class="card" onclick="openCalc('loan')"><span>🏦</span>Loan</div>
+</div>
+</div>
+
+<div id="popup" class="popup"></div>
+
+<script>
+
+// welcome hide
+setTimeout(()=>{
+  document.getElementById("welcome").style.display="none";
+},3000);
+
+// calculators (same as before)
+function openCalc(type){
+let html="";
+
+if(type==="student" || type==="scientific"){
+let sci=(type==="scientific");
+
+html=`
+<input id="display" class="display">
+
+${sci?`
+<button onclick="calc('Math.sin(')">sin</button>
+<button onclick="calc('Math.cos(')">cos</button>
+<button onclick="calc('Math.sqrt(')">√</button>
+<button onclick="calc('Math.log10(')">log</button>
+`:""}
+
+<br>
+<button onclick="calc('7')">7</button>
+<button onclick="calc('8')">8</button>
+<button onclick="calc('9')">9</button>
+<button onclick="calc('/')">÷</button><br>
+
+<button onclick="calc('4')">4</button>
+<button onclick="calc('5')">5</button>
+<button onclick="calc('6')">6</button>
+<button onclick="calc('*')">×</button><br>
+
+<button onclick="calc('1')">1</button>
+<button onclick="calc('2')">2</button>
+<button onclick="calc('3')">3</button>
+<button onclick="calc('-')">-</button><br>
+
+<button onclick="calc('0')">0</button>
+<button onclick="calc('.')">.</button>
+<button onclick="result()">=</button>
+<button onclick="calc('+')">+</button>
+
+<button class="close" onclick="closeCalc()">Close</button>
+`;
+}
+
+if(type==="age"){
+html=`
+<h3>Age Calculator</h3>
+<input id="dob" type="date">
+<button onclick="calcAge()">Calculate</button>
+<p id="resultBox"></p>
+<button class="close" onclick="closeCalc()">Close</button>
+`;
+}
+
+if(type==="gpa"){
+html=`
+<h3>GPA Calculator</h3>
+<input id="marks" placeholder="Enter total marks">
+<button onclick="calcGPA()">Calculate</button>
+<p id="resultBox"></p>
+<button class="close" onclick="closeCalc()">Close</button>
+`;
+}
+
+if(type==="percentage"){
+html=`
+<h3>Percentage</h3>
+<input id="obt" placeholder="Obtained">
+<input id="tot" placeholder="Total">
+<button onclick="calcPer()">Calculate</button>
+<p id="resultBox"></p>
+<button class="close" onclick="closeCalc()">Close</button>
+`;
+}
+
+if(type==="zakat"){
+html=`
+<h3>Zakat</h3>
+<input id="wealth" placeholder="Total wealth">
+<button onclick="calcZakat()">Calculate</button>
+<p id="resultBox"></p>
+<button class="close" onclick="closeCalc()">Close</button>
+`;
+}
+
+if(type==="loan"){
+html=`
+<h3>Loan EMI</h3>
+<input id="amount" placeholder="Amount">
+<input id="rate" placeholder="Interest %">
+<input id="years" placeholder="Years">
+<button onclick="calcLoan()">Calculate</button>
+<p id="resultBox"></p>
+<button class="close" onclick="closeCalc()">Close</button>
+`;
+}
+
+popup.innerHTML=html;
+popup.style.display="block";
+}
+
+function calc(v){display.value+=v;}
+function result(){display.value=eval(display.value);}
+function closeCalc(){popup.style.display="none";}
+
+function calcAge(){
+let dob=new Date(document.getElementById("dob").value);
+let age=new Date().getFullYear()-dob.getFullYear();
+resultBox.innerText="Age: "+age+" years";
+}
+
+function calcGPA(){
+resultBox.innerText="GPA: "+(marks.value/25).toFixed(2);
+}
+
+function calcPer(){
+resultBox.innerText=((obt.value/tot.value)*100).toFixed(2)+"%";
+}
+
+function calcZakat(){
+resultBox.innerText="Zakat: "+(wealth.value*0.025);
+}
+
+function calcLoan(){
+let p=amount.value,r=rate.value/100/12,n=years.value*12;
+let emi=(p*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+resultBox.innerText="EMI: "+emi.toFixed(2);
+}
+
+</script>
+
+</body>
+</html>
